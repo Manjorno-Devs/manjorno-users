@@ -41,4 +41,3 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_ACCOUNT_API_KEY}}
           heroku_app_name: "manjorno-users" #Must be unique in Heroku
           heroku_email: "todorov03@protonmail.com"
-          usedocker: true
