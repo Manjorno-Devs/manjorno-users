@@ -5,6 +5,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
+import routes from './routes/routes.js'
+
 const env = dotenv.config();
 const app = express();
 
@@ -13,9 +15,7 @@ app.use (bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(cors());
 
-app.get('/', (req, res) => {
-    res.status(418).json({"title":"Az sum kafe"});
-});
+app.use('/userapi', routes);
 
 mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser:true, useUnifiedTopology: true})
     .then(result => {
