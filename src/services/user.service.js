@@ -1,8 +1,12 @@
+import bcrypt from 'bcrypt';
+
 import User from "../db/user.js";
 
 class UserService{
 
-    static RegisterUser = async (username, password, email, profilePictureFileName) => {
+    static RegisterUser = async (username, clearPassword, email, profilePictureFileName) => {
+        const salt = await bcrypt.genSalt(12);
+        const password = await bcrypt.hash(clearPassword, salt);
         const newUser = new User({username, password, email, profilePictureFileName});
         await newUser.save();
     };
