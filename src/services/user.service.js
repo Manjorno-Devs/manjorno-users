@@ -7,6 +7,13 @@ class UserService{
         await newUser.save();
     };
 
+    static FindUserByUsername = async (username) => {
+        return await User.findOne({username});
+    };
+
+    static FindUserByEmail = async (email) => {
+        return await User.findOne({email});
+    }
 };
 
 export default UserService; 
