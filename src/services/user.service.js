@@ -23,8 +23,8 @@ class UserService{
         return await User.findById(id);
     }
 
-    static EditUser = async (_id, username, password, email, profilePictureFileName) => {
-        return await User.updateOne(_id, {username, password, email, profilePictureFileName});
+    static EditUser = async (_id, username, password, email, accountType, profilePictureFileName) => {
+        return await User.updateOne(_id, {username, password, email, accountType, profilePictureFileName});
     }
 
     static DeleteUser = async (_id) => {
