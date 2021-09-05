@@ -14,6 +14,18 @@ class UserService{
     static FindUserByEmail = async (email) => {
         return await User.findOne({email});
     }
+
+    static FindUserById = async (id) => {
+        return await User.findById(id);
+    }
+
+    static EditUser = async (_id, username, password, email, profilePictureFileName) => {
+        return await User.updateOne(_id, {username, password, email, profilePictureFileName});
+    }
+
+    static DeleteUser = async (_id) => {
+        return await User.deleteOne({_id});
+    }
 };
 
 export default UserService; 
