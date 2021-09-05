@@ -4,6 +4,8 @@ import User from "../db/user.js";
 
 class UserService{
 
+    constructor(){}
+
     static RegisterUser = async (username, clearPassword, email, profilePictureFileName) => {
         const salt = await bcrypt.genSalt(12);
         const password = await bcrypt.hash(clearPassword, salt);
@@ -23,7 +25,9 @@ class UserService{
         return await User.findById(id);
     }
 
-    static EditUser = async (_id, username, password, email, accountType, profilePictureFileName) => {
+    static EditUser = async (_id, username, clearPassword, email, accountType, profilePictureFileName) => {
+        const salt = await bcrypt.genSalt(12);
+        const password = await bcrypt.hash(clearPassword, salt);
         return await User.updateOne(_id, {username, password, email, accountType, profilePictureFileName});
     }
 
