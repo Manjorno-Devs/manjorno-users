@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import cookieParser from 'cookie-parser'
 
 import routes from './routes/routes.js'
 
@@ -14,6 +15,7 @@ const app = express();
 app.use (bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(cors());
+app.use(cookieParser());
 
 app.use('/userapi', routes);
 
