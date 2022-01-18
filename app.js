@@ -7,13 +7,11 @@ import routes from './src/routes.js';
 
 const app = express();
 
-app.use(cors());
-app.use(bp.urlencoded({extended:true}));
-app.use(bp.json());
-
 const env = dotenv.config();
 
-app.use('/api', routes)
+app.use(express.json());
+
+app.use('/api/users', routes);
 
 const port = process.env.PORT || 3100
 
