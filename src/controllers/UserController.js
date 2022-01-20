@@ -1,7 +1,9 @@
-import KCAdminClient from 'keycloak-admin';
+import KCAdminClient, { requiredAction } from 'keycloak-admin';
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
 import dotenv from 'dotenv';
+import { RequiredActionAlias } from 'keycloak-admin/lib/defs/requiredActionProviderRepresentation.js';
+// /lib/defs/requiredActionProviderRepresentation
 
 const env = dotenv.config();
 
@@ -18,7 +20,7 @@ const Authenticate = async (KeycloakAdminClient) => {
 const IsUserPasswordCorrect = async (usernameFromToken, currentPassword) => {
     const paramsToCheckPassword = new URLSearchParams();
     paramsToCheckPassword.append('client_id', 'admin-cli');
-    paramsToCheckPassword.append('client_secret', '65b8da5b-0391-4e30-8ef6-4fb85b95fb28');
+    paramsToCheckPassword.append('client_secret', process.env.KEYCLOAK_CLIENTCLI_SECRET);
     paramsToCheckPassword.append('username', usernameFromToken);
     paramsToCheckPassword.append('password', currentPassword);
     paramsToCheckPassword.append('grant_type', 'password');
@@ -49,7 +51,27 @@ class UserController{
 
     async RegisterUser(req, res) {
         try {
-            const {username, email, password, firstName, lastName} = req.body;
+            const {username, email, password, repeatPassword, firstName, lastName} = req.body;
+
+            if (username === undefined || email === undefined || password === undefined || repeatPassword === undefined) {
+                const error = "The body has missing fields!";
+                res.status(400).json({error});
+                return;
+            }
+
+            if (password !== repeatPassword) {
+                const error = "Passwords do not match!";
+                res.status(400).json({error});
+                return;
+            }
+
+            let user = await this.KeycloakAdminClient.users.findOne({username, email});
+
+            if (user[0]) {
+                const error = "User already exists!";
+                res.status(400).json({error});
+                return;
+            }
 
             await this.KeycloakAdminClient.users.create({
                 username: username,
@@ -57,14 +79,22 @@ class UserController{
                 firstName: firstName,
                 lastName: lastName,
                 credentials: [{"type":"password","value":password,"temporary":false}],
+                requiredActions: [requiredAction.VERIFY_EMAIL],
                 enabled: true
             });
+
+            user = await this.KeycloakAdminClient.users.findOne({username, email});
+
+            this.KeycloakAdminClient.users.executeActionsEmail({
+                id: user[0].id,
+                lifespan: 43200,
+                actions: [RequiredActionAlias.VERIFY_EMAIL],
+            });
             
-            const message = "User registered successfully!"
+            const message = "User registered successfully! Check your e"
             res.status(200).json({message});
         } catch (error) {
-            const message = error.message;
-            res.status(400).json({message});
+            res.status(500).json(error);
         }
     }
 
@@ -102,18 +132,15 @@ class UserController{
             const usernameFromToken = token.preferred_username;
             const {currentPassword, username, email, firstName, lastName} = req.body;
 
-            if (IsUserPasswordCorrect(usernameFromToken, currentPassword)) {
-                this.KeycloakAdminClient.users.update(
-                    { id:userIdFromToken },
-                    {username, email, firstName, lastName}
-                );
+            await this.KeycloakAdminClient.users.update(
+                { id:userIdFromToken },
+                {username:username, email:email, firstName:firstName, lastName:lastName}
+            );
 
-                const message = "User updated successfully!"
-                res.status(200).json({message});
-            } else {
-                const message = "Incorrect password!";
-                    res.status(401).json({message});
-            }
+            
+            
+            const message = "User updated successfully!"
+            res.status(200).json({message});
         } catch (error) {
             res.status(500).json(error);
         }
@@ -124,28 +151,16 @@ class UserController{
         try {
             const token = jwt.decode(req.headers.authorization.split(' ')[1]);
             const userIdFromToken = token.sub;
-            const usernameFromToken = token.preferred_username;
 
-            const {currentPassword, newPassword} = req.body;
+            this.KeycloakAdminClient.users.executeActionsEmail({
+                id: userIdFromToken,
+                lifespan: 43200,
+                actions: [RequiredActionAlias.UPDATE_PASSWORD],
+            });
 
-            if (IsUserPasswordCorrect(usernameFromToken, currentPassword)) {
-                this.KeycloakAdminClient.users.resetPassword({
-                    id: userIdFromToken,
-                    credential:{
-                        temporary: false,
-                        type: 'password',
-                        value: newPassword
-                    }
-                });
-                
-                const message = "Password updated successfully!";
-                res.status(200).json({message});
-            } else {
-                const message = "Incorrect password!";
-                res.status(401).json({message});
-            }
+            const message = "Please check your e-mail inbox for the link to reset your password!";
+            res.status(200).json({message});
         } catch (err) {
-            const error = err.message
             res.status(500).json({err});
         }
     }

@@ -10,7 +10,7 @@ const config = {
     "ssl-required": "external",
     "resource": "express-microservice",
     "confidential-port": 0
-  };
+  }
 
 export default function KeycloakInit() {
     if (keycloak) {
