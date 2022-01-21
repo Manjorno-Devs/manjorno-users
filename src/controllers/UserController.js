@@ -91,7 +91,7 @@ class UserController{
                 actions: [RequiredActionAlias.VERIFY_EMAIL],
             });
             
-            const message = "User registered successfully! Check your e"
+            const message = "User registered successfully! Check your E-Mail inbox to verify your email!"
             res.status(200).json({message});
         } catch (error) {
             res.status(500).json(error);
