@@ -17,6 +17,9 @@ router.get('/count', async (req, res) => uc.GetUsersCount(req, res));
 router.use(keycloak.middleware());
 
 router.patch('/update', keycloak.protect(), async (req, res) => uc.UpdateUser(req, res));
-router.patch('/resetPassword', keycloak.protect(), async (req, res) => uc.ResetPassword(req, res));
+router.patch('/resetPassword/currentPassword', keycloak.protect(), async (req, res) => uc.ResetPasswordWithCurrentPassword(req, res));
+router.patch('/resetPassword/email', keycloak.protect(), async (req, res) => uc.ResetPasswordWithEmail(req, res));
+
+
 
 export default router;
