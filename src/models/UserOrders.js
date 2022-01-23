@@ -1,12 +1,13 @@
 import mongoose from 'mongoose';
 
 export default UserOrders = mongoose.model('UserOrders', new mongoose.Schema({
-    ordererId: {
+    receiverId: {
         type: String,
         required: true
     },
-    {
-
+    delivererId: {
+        type: String, 
+        required: true
     },
     restaurantId: {
         type: mongoose.ObjectId,
