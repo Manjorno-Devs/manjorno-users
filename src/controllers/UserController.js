@@ -1,55 +1,23 @@
 import KCAdminClient, { requiredAction } from 'keycloak-admin';
 import jwt from 'jsonwebtoken';
-import axios from 'axios';
 import dotenv from 'dotenv';
 import { RequiredActionAlias } from 'keycloak-admin/lib/defs/requiredActionProviderRepresentation.js';
-// /lib/defs/requiredActionProviderRepresentation
+
+import Authenticate from './helpers/AuthenticateKeycloak.js';
+import IsUserPasswordCorrect from './helpers/CheckPassword.js';
 
 const env = dotenv.config();
 
-const Authenticate = async (KeycloakAdminClient) => {
-    return await KeycloakAdminClient.auth({
-        username: process.env.KEYCLOAK_USERNAME,
-        password: process.env.KEYCLOAK_PASSWORD,
-        grantType: 'password',
-        clientId: 'admin-cli',
-        clientSecret: process.env.KEYCLOAK_CLIENTCLI_SECRET
-    });
-}
-
-const IsUserPasswordCorrect = async (username, password) => {
-    const paramsToCheckPassword = new URLSearchParams();
-    paramsToCheckPassword.append('client_id', 'admin-cli');
-    paramsToCheckPassword.append('client_secret', process.env.KEYCLOAK_CLIENTCLI_SECRET);
-    paramsToCheckPassword.append('username', username);
-    paramsToCheckPassword.append('password', password);
-    paramsToCheckPassword.append('grant_type', 'password');
-     const passwordCheckConfig = {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      }
-    
-    let result;
-    await axios.post('http://localhost:8080/auth/realms/Manjorno/protocol/openid-connect/token', paramsToCheckPassword, passwordCheckConfig)
-        .then(() => {
-            result = true;
-        })
-        .catch(() => {
-            result = false;
-        });
-    return result;
-}
+let KeycloakAdminClient;
 
 class UserController{
 
-    KeycloakAdminClient;
 
     //Initializes the Keycloak admin client 
     //and authenticates an admin user that will execute all of the CRUD operations to Keycloak
     constructor(){
-        this.KeycloakAdminClient = new KCAdminClient.default({ realmName: "Manjorno" });
-        Authenticate(this.KeycloakAdminClient);
+        KeycloakAdminClient = new KCAdminClient.default({ realmName: "Manjorno" });
+        Authenticate(KeycloakAdminClient);
     }
 
     //Registers a new user
@@ -73,7 +41,7 @@ class UserController{
             }
 
             // seraches if a user with a username or email matching to that of the body exists
-            let user = await this.KeycloakAdminClient.users.findOne({username, email});
+            let user = await KeycloakAdminClient.users.findOne({username, email});
 
             //if it exists then it returns an error
             if (user[0]) {
@@ -85,7 +53,7 @@ class UserController{
             //if everything is fine, it creates the user
             //requiredActions marks that an email should be sent to the user
             //to confirm the email address
-            await this.KeycloakAdminClient.users.create({
+            await KeycloakAdminClient.users.create({
                 username: username,
                 email: email,
                 firstName: firstName,
@@ -96,10 +64,10 @@ class UserController{
             });
 
             //Searches for the newly created user
-            user = await this.KeycloakAdminClient.users.findOne({username, email});
+            user = await KeycloakAdminClient.users.findOne({username, email});
 
             //sent an email to confirm the email address
-            this.KeycloakAdminClient.users.executeActionsEmail({
+            KeycloakAdminClient.users.executeActionsEmail({
                 id: user[0].id,
                 lifespan: 43200,
                 actions: [RequiredActionAlias.VERIFY_EMAIL],
@@ -120,7 +88,7 @@ class UserController{
             const {id, username, email} = req.query;
 
             //does the actual searching
-            const user = await this.KeycloakAdminClient.users.findOne({id, username, email});
+            const user = await KeycloakAdminClient.users.findOne({id, username, email});
 
             //Returns an error if an user doesn't exist
             if (!user) {
@@ -140,7 +108,7 @@ class UserController{
     async GetUsersCount(req, res) {
         try {
             //extracts the admin user that does the Keycloak operations in the realm
-            const userCount = await this.KeycloakAdminClient.users.count() - 1;
+            const userCount = await KeycloakAdminClient.users.count() - 1;
             
             res.status(200).json({userCount});
         } catch (error) {
@@ -161,7 +129,7 @@ class UserController{
             const {currentPassword, username, email, firstName, lastName} = req.body;
 
             //finds a user with matching the id of the token
-            const user = await this.KeycloakAdminClient.users.findOne({userIdFromToken});
+            const user = await KeycloakAdminClient.users.findOne({userIdFromToken});
 
             //If a user id from the token is not found in Keycloak, it yields an error
             if (!user[0]) {
@@ -177,7 +145,7 @@ class UserController{
             }
 
             //Request to keycloak to update the details
-            await this.KeycloakAdminClient.users.update(
+            await KeycloakAdminClient.users.update(
                 { id:userIdFromToken },
                 {username, email, firstName, lastName}
             );
@@ -228,7 +196,7 @@ class UserController{
             //gets user id from token
             const userIdFromToken = token.sub;
 
-            this.KeycloakAdminClient.users.executeActionsEmail({
+            KeycloakAdminClient.users.executeActionsEmail({
                 id: userIdFromToken,
                 lifespan: 43200,
                 actions: [RequiredActionAlias.UPDATE_PASSWORD],
