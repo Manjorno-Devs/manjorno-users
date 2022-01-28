@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-export default UserRestaurants = mongoose.model('UserRestaurants', new mongoose.Schema({
+const UserRestaurants = mongoose.model('UserRestaurants', new mongoose.Schema({
     userId: {
         type: String,
         required: true
@@ -14,11 +14,14 @@ export default UserRestaurants = mongoose.model('UserRestaurants', new mongoose.
         required: true
     },
     position: {
-        type: Array,
+        type: String,
+        enum: ['employee', 'manager'],
         required: true,
     },
     dateTimeAdded: {
-        type: DateTime,
-        default: new DateTime()
+        type: Date,
+        default: new Date()
     }
 }));
+
+export default UserRestaurants;

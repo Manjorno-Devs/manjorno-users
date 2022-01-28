@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
 import routes from './src/routes.js';
+import UserRestaurantsRouter from './src/controllers/UserRestaurantController.js';
 
 const app = express();
 
@@ -13,6 +14,7 @@ const env = dotenv.config();
 app.use(express.json());
 
 app.use('/api/users', routes);
+app.use('/api/restaurant', UserRestaurantsRouter);
 
 const port = process.env.PORT || 3100
 
