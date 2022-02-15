@@ -2,7 +2,7 @@ import express from 'express';
 
 import UserController from './controllers/UserController.js';
 
-import KeycloakInit from '../src/configurations/InitKeycloak.js';
+import KeycloakInit from './helpers/InitKeycloak.js';
 
 const router = express.Router();
 
@@ -16,10 +16,9 @@ router.get('/count', async (req, res) => uc.GetUsersCount(req, res));
 
 router.use(keycloak.middleware());
 
-router.patch('/update', keycloak.protect(), async (req, res) => uc.UpdateUser(req, res));
+router.put('/update', keycloak.protect(), async (req, res) => uc.UpdateUser(req, res));
 router.patch('/resetPassword/currentPassword', keycloak.protect(), async (req, res) => uc.ResetPasswordWithCurrentPassword(req, res));
 router.patch('/resetPassword/email', keycloak.protect(), async (req, res) => uc.ResetPasswordWithEmail(req, res));
-
-
+router.delete('/delete', keycloak.protect(), async(req, res) => uc.DeleteUser(req, res));
 
 export default router;

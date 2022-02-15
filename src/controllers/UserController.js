@@ -3,12 +3,12 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { RequiredActionAlias } from 'keycloak-admin/lib/defs/requiredActionProviderRepresentation.js';
 
-import Authenticate from './helpers/AuthenticateKeycloak.js';
-import IsUserPasswordCorrect from './helpers/CheckPassword.js';
+import UserService from '../services/UserService.js';
+
+import Authenticate from '../helpers/AuthenticateKeycloak.js';
+import IsUserPasswordCorrect from '../helpers/CheckPassword.js';
 
 const env = dotenv.config();
-
-let KeycloakAdminClient;
 
 class UserController{
 
@@ -16,8 +16,7 @@ class UserController{
     //Initializes the Keycloak admin client 
     //and authenticates an admin user that will execute all of the CRUD operations to Keycloak
     constructor(){
-        KeycloakAdminClient = new KCAdminClient.default({ realmName: "Manjorno" });
-        Authenticate(KeycloakAdminClient);
+        this.UserService = new UserService();
     }
 
     //Registers a new user
@@ -41,7 +40,7 @@ class UserController{
             }
 
             // seraches if a user with a username or email matching to that of the body exists
-            let user = await KeycloakAdminClient.users.findOne({username, email});
+            let user = await this.UserService.FindUser(username, email);
 
             //if it exists then it returns an error
             if (user[0]) {
@@ -53,31 +52,16 @@ class UserController{
             //if everything is fine, it creates the user
             //requiredActions marks that an email should be sent to the user
             //to confirm the email address
-            await KeycloakAdminClient.users.create({
-                username: username,
-                email: email,
-                firstName: firstName,
-                lastName: lastName,
-                credentials: [{"type":"password","value":password,"temporary":false}],
-                requiredActions: [requiredAction.VERIFY_EMAIL],
-                enabled: true
-            });
+            await this.UserService.AddNewUser(username, email, password, firstName, lastName);
 
             //Searches for the newly created user
-            user = await KeycloakAdminClient.users.findOne({username, email});
-
-            //sent an email to confirm the email address
-            KeycloakAdminClient.users.executeActionsEmail({
-                id: user[0].id,
-                lifespan: 43200,
-                actions: [RequiredActionAlias.VERIFY_EMAIL],
-            });
+            user = await this.UserService.FindUser(username, email);
             
             //returns a success message
             const message = "User registered successfully! Check your E-Mail inbox to verify your email!"
             res.status(200).json({message});
         } catch (error) {
-            res.status(500).json(error);
+            // res.status(500).json(error);
         }
     }
 
@@ -88,10 +72,10 @@ class UserController{
             const {id, username, email} = req.query;
 
             //does the actual searching
-            const user = await KeycloakAdminClient.users.findOne({id, username, email});
+            const user = await this.UserService.FindUser(id, username, email);
 
             //Returns an error if an user doesn't exist
-            if (!user) {
+            if (!user[0]) {
                 const error = "User could not be found!"
                 res.status(400).json({error});
                 return;
@@ -108,11 +92,12 @@ class UserController{
     async GetUsersCount(req, res) {
         try {
             //extracts the admin user that does the Keycloak operations in the realm
-            const userCount = await KeycloakAdminClient.users.count() - 1;
+            const userCount = await this.UserService.UserCount();
             
             res.status(200).json({userCount});
-        } catch (error) {
-            res.status(500).json(error);
+        } catch (err) {
+            const error = err.message
+            res.status(500).json({error});
         }
     }
 
@@ -129,7 +114,7 @@ class UserController{
             const {currentPassword, username, email, firstName, lastName} = req.body;
 
             //finds a user with matching the id of the token
-            const user = await KeycloakAdminClient.users.findOne({userIdFromToken});
+            const user = await this.UserService.FindUser(userIdFromToken);
 
             //If a user id from the token is not found in Keycloak, it yields an error
             if (!user[0]) {
@@ -138,6 +123,7 @@ class UserController{
                 return;
             }
 
+            //checks if the provided password is correct
             if (!(await IsUserPasswordCorrect(usernameFromToken, currentPassword))) {
                 const error = "Incorrect password! Please reset your password through your e-mail!"
                 res.status(403).json({error});
@@ -145,10 +131,7 @@ class UserController{
             }
 
             //Request to keycloak to update the details
-            await KeycloakAdminClient.users.update(
-                { id:userIdFromToken },
-                {username, email, firstName, lastName}
-            );
+            await this.UserService.UpdateUser(userIdFromToken, username, email, firstName, lastName);
             
             //returns a success message
             const message = "User updated successfully!"
@@ -163,11 +146,23 @@ class UserController{
         try {
             //gets the authorization token
             const token = jwt.decode(req.headers.authorization.split(' ')[1]);
+            //gets the user id from the authorization token
+            const userIdFromToken = token.sub;
             //gets the username from the authorization token
             const usernameFromToken = token.preferred_username
 
             //getting the needed parametes from the body
             const {currentPassword, newPassword, repeatPassword} = req.body;
+
+            //finds a user with matching the id of the token
+            const user = await this.UserService.FindUser(userIdFromToken);
+
+            //If a user id from the token is not found in Keycloak, it yields an error
+            if (!user[0]) {
+                const error = "User not found!";
+                res.status(401).json({error});
+                return;
+            }
 
             //checking if the passwords match
             if (newPassword !== repeatPassword) {
@@ -181,6 +176,9 @@ class UserController{
                 res.status(403).json({error});
                 return;
             }
+
+            //request keycloak to update user's password
+            await this.UserService.ResetPassword(userIdFromToken, newPassword);
 
             const message = "Password change successful!";
             res.status(200).json({message});
@@ -196,11 +194,18 @@ class UserController{
             //gets user id from token
             const userIdFromToken = token.sub;
 
-            KeycloakAdminClient.users.executeActionsEmail({
-                id: userIdFromToken,
-                lifespan: 43200,
-                actions: [RequiredActionAlias.UPDATE_PASSWORD],
-            });
+            //finds a user with matching the id of the token
+            const user = await this.UserService.FindUser(userIdFromToken);
+
+            //If a user id from the token is not found in Keycloak, it yields an error
+            if (!user[0]) {
+                const error = "User not found!";
+                res.status(401).json({error});
+                return;
+            }
+
+            //Reset user's password by sending the user an email a link
+            await this.UserService.ResetPasswordWithEmail(userIdFromToken);
 
             const message = "Please check your e-mail inbox for the link to reset your password!";
             res.status(200).json({message});
@@ -208,6 +213,34 @@ class UserController{
             res.status(500).json({err});
         }
     }    
+
+    async DeleteUser(req, res) {
+        try {
+            //gets the authorization token
+            const token = jwt.decode(req.headers.authorization.split(' ')[1]);
+            //gets user id from token
+            const userIdFromToken = token.sub;
+
+            //finds a user with matching the id of the token
+            const user = await this.UserService.FindUser(userIdFromToken);
+
+            //If a user id from the token is not found in Keycloak, it yields an error
+            if (!user[0]) {
+                const error = "User not found!";
+                res.status(401).json({error});
+                return;
+            }
+
+            //Reset user's password by sending link to the user's email
+            await this.UserService.DeleteUser(userIdFromToken);
+
+            const message = "Account deleted successfully";
+            res.status(200).json({message});
+        } catch (error) {
+            console.log(error);
+            res.status(500).json(error);
+        }
+    }
 }
 
 export default UserController;

@@ -6,11 +6,12 @@ import UserRestaurants from '../models/UserRestaurants.js';
 
 class UserRestaurantsService {
     static CreateRestaurantUserRelation = (userId, restaurantId, restaurantName, position, dateTimeAdded) => {
-        const user =  UserRestaurants.create({userId, restaurantId, restaurantName, position, dateTimeAdded});
-        return user;
+        const _id = mongoose.Types.ObjectId();
+        UserRestaurants.create({_id, userId, restaurantId, restaurantName, position, dateTimeAdded});
+        return _id;
     }
 
-    static GetRestaurantsUserRelations = (userId, restaurantId, restaurantName) => {
+    static GetRestaurantsUserRelations = (_id, userId, restaurantId, restaurantName) => {
         const userRestaurantRelation = UserRestaurants.find({userId, restaurantId, restaurantName});
         return userRestaurantRelation;
     }
