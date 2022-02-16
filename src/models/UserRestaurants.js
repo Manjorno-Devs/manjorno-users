@@ -21,6 +21,10 @@ const UserRestaurants = mongoose.model('UserRestaurants', new mongoose.Schema({
     dateTimeAdded: {
         type: Date,
         default: new Date()
+    },
+    workingHere: {
+        type: Boolean,
+        default: true
     }
 }));
 
