@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-microservice
+spec:
+  selector:
+    matchLabels:
+      app: user-microservice
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: user-microservice
+    spec:
+      containers:
+      - name: user-microservice
+        image: manjornocontainers.azurecr.io/test-publisher-app
+        imagePullPolicy: Always
+        env:
+        - name: RABBITMQ_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: username
+        - name: RABBITMQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: password
+        - name : RABBITMQ_SERVER
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: server
+        ports:
+        - containerPort: 3100
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-microservice
+spec:
+  selector:
+    app: user-microservice
+  ports:
+  - port: 3100
+    targetPort: 3100
