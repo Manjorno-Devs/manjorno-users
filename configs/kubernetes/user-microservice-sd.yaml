@@ -18,7 +18,7 @@ spec:
         imagePullPolicy: Always
         env:
         - name: KEYCLOAK_URL
-          value: "http://10.244.0.28:8080/auth"
+          value: "http://52.234.161.164//auth"
         - name: KEYCLOAK_USERNAME
           valueFrom:
             secretKeyRef:
