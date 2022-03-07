@@ -1,12 +1,15 @@
 import session from "express-session";
 import Keycloak from "keycloak-connect";
+import dotenv from 'dotenv';
 
 let keycloak;
+
+const env = dotenv.config();
 
 const config = {
     "realm": "Manjorno",
     "bearer-only": true,
-    "auth-server-url": "http://localhost:8080/auth/",
+    "auth-server-url": process.env.KEYCLOAK_URL,
     "ssl-required": "external",
     "resource": "express-microservice",
     "confidential-port": 0

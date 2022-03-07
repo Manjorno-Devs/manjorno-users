@@ -14,8 +14,26 @@ spec:
     spec:
       containers:
       - name: user-microservice
-        image: manjorno.azurecr.io/user-microservice
+        image: manjornocontainers.azurecr.io/test-publisher-app
         imagePullPolicy: Always
+        env:
+        -name: KEYCLOAK_URL
+         value: http://52.142.38.205/auth
+        - name: KEYCLOAK_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-secret
+              key: username
+        - name: KEYCLOAK_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-secret
+              key: password
+        - name : KEYCLOAK_CLIENTCLI_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-secret
+              key: clientSecret
         ports:
         - containerPort: 3100
 

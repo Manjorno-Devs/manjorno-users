@@ -14,7 +14,7 @@ const IsUserPasswordCorrect = async (username, password) => {
     };
 
     let result;
-    await axios.post('http://localhost:8080/auth/realms/Manjorno/protocol/openid-connect/token', params, headers)
+    await axios.post('http://52.142.38.205/auth/realms/Manjorno/protocol/openid-connect/token', params, headers)
         .then(() => {
                 result = true;
         })
