@@ -61,7 +61,8 @@ class UserController{
             const message = "User registered successfully! Check your E-Mail inbox to verify your email!"
             res.status(200).json({message});
         } catch (error) {
-            // res.status(500).json(error);
+            error = error.message
+            res.status(500).json({error});
         }
     }
 
@@ -131,13 +132,17 @@ class UserController{
             }
 
             //Request to keycloak to update the details
-            await this.UserService.UpdateUser(userIdFromToken, username, email, firstName, lastName);
+            try {
+                await this.UserService.UpdateUser(userIdFromToken, username, email, firstName, lastName);
+            } catch (error) {
+                console.log(error);
+            }
             
             //returns a success message
             const message = "User updated successfully!"
             res.status(200).json({message});
         } catch (error) {
-            res.status(500).json(error);
+            res.status(500).json(error.message);
         }
         
     }
