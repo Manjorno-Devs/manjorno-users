@@ -16,22 +16,6 @@ spec:
       - name: user-microservice
         image: manjorno.azurecr.io/user-microservice
         imagePullPolicy: Always
-        env:
-        - name: RABBITMQ_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: rabbitmq-secret
-              key: username
-        - name: RABBITMQ_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: rabbitmq-secret
-              key: password
-        - name : RABBITMQ_SERVER
-          valueFrom:
-            secretKeyRef:
-              name: rabbitmq-secret
-              key: server
         ports:
         - containerPort: 3100
 
