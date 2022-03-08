@@ -20,15 +20,9 @@ spec:
         - name: KEYCLOAK_URL
           value: "http://52.142.38.205/auth"
         - name: KEYCLOAK_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: keycloak-secret
-              key: username
+          value: backendapp
         - name: KEYCLOAK_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: keycloak-secret
-              key: password
+          value: i5JtyQIWfldiwZFuK64w5emej5zGjpde
         - name : KEYCLOAK_CLIENTCLI_SECRET
           value: wINGuKIh73lKM8akMkKrT6n7D65fVm0I
         ports:
