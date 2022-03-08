@@ -38,14 +38,31 @@ spec:
         - containerPort: 3100
 
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
-  name: user-microservice
+    name: user-microservice
 spec:
-  selector:
-    app: user-microservice
-  ports:
-    - port: 3100
-      targetPort: 3100
-  type: LoadBalancer
+    ports:
+    - port: 3000
+      protocol: TCP
+      targetPort: 3000
+    selector:
+        app: user-microservice
+    type: ClusterIP
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: user-microservice
+spec:
+    rules:
+    - http:
+        paths:
+        - path: /api/users
+          backend:
+            serviceName: user-microservice
+            servicePort: 3100
