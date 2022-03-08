@@ -49,5 +49,5 @@ spec:
   ports:
   - port: 3100
     targetPort: 3100
-type: LoadBalancer
+  type: LoadBalancer
 
