@@ -13,7 +13,7 @@ spec:
         app: user-microservice
     spec:
       containers:
-      - name: user-microservice
+      - name: user-microservice0
         image: manjorno.azurecr.io/user-microservice
         imagePullPolicy: Always
         env:
