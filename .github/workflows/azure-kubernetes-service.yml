@@ -83,6 +83,7 @@ jobs:
       with:
         manifests: |
           configs/kubernetes/user-microservice-sd.yaml
+          configs/kubernetes/user-microservice-ingress.yaml
         images: |
           ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.REPOSITORY_NAME }}:${{ github.sha }}
         imagepullsecrets: |

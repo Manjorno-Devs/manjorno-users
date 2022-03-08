@@ -30,24 +30,21 @@ spec:
               name: keycloak-secret
               key: password
         - name : KEYCLOAK_CLIENTCLI_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: keycloak-secret
-              key: secret
+          value: wINGuKIh73lKM8akMkKrT6n7D65fVm0I
         ports:
         - containerPort: 3100
 
 ---
 
-apiVersion: v1
-kind: Service
-metadata:
-  name: user-microservice
-spec:
-  selector:
-    app: user-microservice
-  ports:
-  - port: 3100
-    targetPort: 3100
-  type: LoadBalancer
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: user-microservice
+# spec:
+#   selector:
+#     app: user-microservice
+#   ports:
+#   - port: 3100
+#     targetPort: 3100
+#   type: LoadBalancer
 
