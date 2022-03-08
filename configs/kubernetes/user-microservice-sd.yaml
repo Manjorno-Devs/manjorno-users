@@ -45,9 +45,9 @@ metadata:
     name: user-microservice
 spec:
     ports:
-    - port: 3000
+    - port: 3100
       protocol: TCP
-      targetPort: 3000
+      targetPort: 3100
     selector:
         app: user-microservice
     type: ClusterIP
