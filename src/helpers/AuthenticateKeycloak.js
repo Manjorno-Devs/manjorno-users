@@ -4,11 +4,12 @@ const Authenticate = async (KeycloakAdminClient) => {
         console.log(process.env.KEYCLOAK_PASSWORD);
         console.log(process.env.KEYCLOAK_CLIENTCLI_SECRET);
         return await KeycloakAdminClient.auth({
+
+            clientSecret: process.env.KEYCLOAK_CLIENTCLI_SECRET,
             username: process.env.KEYCLOAK_USERNAME,
             password: process.env.KEYCLOAK_PASSWORD,
             grantType: 'password',
-            clientId: 'admin-cli',
-            clientSecret: process.env.KEYCLOAK_CLIENTCLI_SECRET
+            clientId: 'admin-cli'
         });
     } catch (error) {
         console.log(error);
