@@ -1,4 +1,7 @@
 import axios from 'axios';
+import dotenv from 'dotenv';
+
+const env = dotenv.config();
 
 const IsUserPasswordCorrect = async (username, password) => {
     const params= new URLSearchParams();
@@ -14,7 +17,7 @@ const IsUserPasswordCorrect = async (username, password) => {
     };
 
     let result;
-    await axios.post('http://52.142.38.205/auth/realms/Manjorno/protocol/openid-connect/token', params, headers)
+    await axios.post(`${process.env.KEYCLOAK_URL}/realms/Manjorno/protocol/openid-connect/token`, params, headers)
         .then(() => {
                 result = true;
         })

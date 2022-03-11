@@ -132,11 +132,7 @@ class UserController{
             }
 
             //Request to keycloak to update the details
-            try {
-                await this.UserService.UpdateUser(userIdFromToken, username, email, firstName, lastName);
-            } catch (error) {
-                console.log(error);
-            }
+            await this.UserService.UpdateUser(userIdFromToken, username, email, firstName, lastName);
             
             //returns a success message
             const message = "User updated successfully!"
