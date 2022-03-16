@@ -81,7 +81,7 @@ class UserService {
             credential: {
               temporary: false,
               type: 'password',
-              value: 'test',
+              value: password,
             }});
     }
 
