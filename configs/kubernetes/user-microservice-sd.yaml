@@ -18,13 +18,13 @@ spec:
         imagePullPolicy: Always
         env:
         - name: KEYCLOAK_URL
-          value: "http://52.142.38.205/auth"
+          value: keycloak.keycloak.svc.cluster.local
         - name: KEYCLOAK_USERNAME
           value: backendapp
         - name: KEYCLOAK_PASSWORD
           value: i5JtyQIWfldiwZFuK64w5emej5zGjpde
         - name : KEYCLOAK_CLIENTCLI_SECRET
-          value: wINGuKIh73lKM8akMkKrT6n7D65fVm0I
+          value: MVZQhNqty4FIMKcWFgOjsLc4zoE8G4hC
         ports:
         - containerPort: 3100
 

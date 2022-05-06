@@ -75,7 +75,7 @@ class UserService {
     //Reset user's password
     async ResetPassword(_id, password) {
         await Authenticate(this.KeycloakAdminClient);
-
+        
         await this.KeycloakAdminClient.users.resetPassword({
             id: _id,
             credential: {
