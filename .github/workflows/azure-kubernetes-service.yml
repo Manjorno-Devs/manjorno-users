@@ -7,11 +7,11 @@ on:
     branches: [ main ]
 
 env:
-  REGISTRY_NAME: manjorno
+  REGISTRY_NAME: manjorno1
   CLUSTER_NAME: Manjorno
   RESOURCE_GROUP: Manjorno_group
-  NAMESPACE: user-microservice
-  REPOSITORY_NAME: user-microservice
+  NAMESPACE: users-microservice
+  REPOSITORY_NAME: manjorno-users
   
 
 jobs:
