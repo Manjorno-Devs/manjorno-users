@@ -3,7 +3,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: user-microservice-ingress
-  namespace: user-microservice0
+  namespace: users-microservice
 spec:
   ingressClassName: kong
   rules:
