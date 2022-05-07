@@ -13,6 +13,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: users-microservice
+            name: manjorno-users
             port:
               number: 3100

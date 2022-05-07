@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: users-microservice
+  name: manjorno-users
 spec:
   selector:
     matchLabels:
-      app: users-microservice
+      app: manjorno-users
   replicas: 1
   template:
     metadata:
       labels:
-        app: users-microservice
+        app: manjorno-users
     spec:
       containers:
-      - name: users-microservice
-        image: manjorno.azurecr.io/users-microservice
+      - name: manjorno-users
+        image: manjorno.azurecr.io/manjorno-users
         imagePullPolicy: Always
         env:
         - name: KEYCLOAK_URL
@@ -33,10 +33,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: users-microservice
+  name: manjorno-users
 spec:
   selector:
-    app: users-microservice
+    app: manjorno-users
   ports:
   - port: 3100
     targetPort: 3100
