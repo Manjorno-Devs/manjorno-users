@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: manjorno-users
-        image: manjorno.azurecr.io/manjorno-users
+        image: manjorno1.azurecr.io/manjorno-users
         imagePullPolicy: Always
         env:
         - name: KEYCLOAK_URL
