@@ -13,6 +13,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: user-microservice
+            name: users-microservice
             port:
               number: 3100
