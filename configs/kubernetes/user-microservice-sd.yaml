@@ -20,11 +20,23 @@ spec:
         - name: KEYCLOAK_URL
           value: http://keycloak.keycloak.svc.cluster.local:8080/auth
         - name: KEYCLOAK_USERNAME
-          value: backendapp
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-secret
+              key: username
+              optional: false
         - name: KEYCLOAK_PASSWORD
-          value: i5JtyQIWfldiwZFuK64w5emej5zGjpde
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-secret
+              key: password
+              optional: false
         - name : KEYCLOAK_CLIENTCLI_SECRET
-          value: 2o28n1MnlgKjcj0hyDFm6H5H5um7868W
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-secret
+              key: client_cli_secret
+              optional: false
         ports:
         - containerPort: 3100
 
