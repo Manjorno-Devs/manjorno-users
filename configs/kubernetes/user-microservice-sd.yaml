@@ -24,7 +24,7 @@ spec:
         - name: KEYCLOAK_PASSWORD
           value: i5JtyQIWfldiwZFuK64w5emej5zGjpde
         - name : KEYCLOAK_CLIENTCLI_SECRET
-          value: MVZQhNqty4FIMKcWFgOjsLc4zoE8G4hC
+          value: 2o28n1MnlgKjcj0hyDFm6H5H5um7868W
         ports:
         - containerPort: 3100
 
