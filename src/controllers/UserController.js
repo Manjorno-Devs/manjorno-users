@@ -61,7 +61,6 @@ class UserController{
             const message = "User registered successfully! Check your E-Mail inbox to verify your email!"
             res.status(200).json({message});
         } catch (error) {
-            error = error.message
             res.status(500).json({error});
         }
     }
